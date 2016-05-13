@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>cbodies test</title>
+	<script src="./js/nexusUI.js"></script>
+	<script>
+	nx.onload = function() {
+
+		nx.colorize("accent", "#0be");
+		nx.colorize("fill", "#444449");
+
+		light.on('value', function(data) {
+			console.log("click light toogle " + data);
+			if(data) {
+				colorLIGHT.val = {
+					r: 0,
+					g: 255,
+					b: 0
+				}
+				colorLIGHT.transmit(colorLIGHT.val);
+				colorLIGHT.drawColor();
+			} else {
+				colorLIGHT.val = {
+					r: 255,
+					g: 0,
+					b: 0
+				}
+				colorLIGHT.transmit(colorLIGHT.val);
+				colorLIGHT.drawColor();
+			}
+
+		});
+
+		red.on('value', function(data) {
+			console.log("move red slider " + data);
+			colorRGB.val = {
+				r: parseInt(red.val.value),
+				g: parseInt(green.val.value),
+				b: parseInt(blue.val.value)
+			}
+			colorRGB.transmit(colorRGB.val);
+			colorRGB.drawColor();
+
+		});
+
+		green.on('value', function(data) {
+			console.log("move green slider " + data);
+			colorRGB.val = {
+				r: parseInt(red.val.value),
+				g: parseInt(green.val.value),
+				b: parseInt(blue.val.value)
+			}
+			colorRGB.transmit(colorRGB.val);
+			colorRGB.drawColor();
+
+		});
+
+		blue.on('value', function(data) {
+			console.log("move blue slider " + data);
+			/*
+			colorRGB.val = {
+			r: 255,
+			g: 0,
+			b: 0
+		}
+		*/
+		colorRGB.val = {
+			r: parseInt(red.val.value),
+			g: parseInt(green.val.value),
+			b: parseInt(blue.val.value)
+		}
+		colorRGB.transmit(colorRGB.val);
+		colorRGB.drawColor();
+
+	});
+
+
+}
+</script>
+</head>
+<body>
+	<h1>cbodies</h1>
+
+	<table>
+		<tr>
+			<td>
+				<canvas nx="slider" min="0" max="255" label="RED" id="red"></canvas>
+			</td>
+			<td>
+				<canvas nx="slider" min="0" max="255" label="GREEN" id="green"></canvas>
+			</td>
+			<td>
+				<canvas nx="slider" min="0" max="255" label="BLUE" id="blue"></canvas>
+			</td>
+			<td>
+				<canvas nx="colors" id="colorRGB"></canvas>
+			</td>
+		</tr>
+	</table>
+
+	<table>
+		<tr>
+			<td>
+				<canvas nx="toggle" label="LIGHT" id="light"></canvas>
+			</td>
+			<td>
+				<canvas nx="colors" id="colorLIGHT"></canvas>
+			</td>
+		</tr>
+	</table>
+
+</body>
+</html>

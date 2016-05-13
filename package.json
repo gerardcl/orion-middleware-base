@@ -1,0 +1,21 @@
+{
+  "name": "orion-middleware",
+  "version": "1.0.0",
+  "description": "orion middleware service",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/gerardcl/orion-middleware"
+  },
+  "author": "gerardcl@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "~1.0.1",
+    "express": "~4.0.0",
+    "mongoose": "~3.6.13",
+    "node-rest-client": "^1.8.0"
+  }
+}
