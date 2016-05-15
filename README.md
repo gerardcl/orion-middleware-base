@@ -2,14 +2,19 @@
 
 Translates/simplifies ORION API through GET queries for specific scenario/context defined.
 
-- API:
+- API routes:
+  - GETs:
+   - '/api' : Orion version info
+   - '/api/cbodies' : All cbodies/scenarios info
+   - '/api/cbodies/:scenario_id' : Specific cbodie/s info
+   - '/api/cbodies/:scenario_id/:sensortype' : Specific cbodie/s and sensor/s type info
+   - '/api/cbodies/:scenario_id/:sensortype/:pintype' : Specific cbodie/s, sensor/s and pin/s type info
+   - '/api/cbodies/:scenario_id/:sensortype/:pintype/:pin' : Specific cbodie/s, sensor/s, pin/s type/s and specific pin/s info
 
-  host:port/api/cbodies/:scenario_id/:sensortype/:pintype/:pin
 
 - Param values:
-
   - :scenario_id
-    - all
+    - all (same as GET /api/cbodies)
     - specific value (i.e.: 2)
     - set of values (i.e: 1:3:2 <-- element 1, 3 and 2)
   - :sensortype

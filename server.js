@@ -32,6 +32,94 @@ client.registerMethod("orionVersion", ""+orionBaseURL+"/version", "GET");
 client.registerMethod("queryContext", orionBaseURL+"/v1/queryContext", "POST");
 
 //////////
+// ROUTES
+//////////
+// Root API route: orionVersion
+router.get('/', function(req, res) {
+  console.log("GET /");
+  client.methods.orionVersion(function (data, response) {
+    console.log("SERVICE CHECK:");
+    console.log(data);
+    res.json(data);
+  });
+});
+
+// API GET routes
+router.get('/cbodies', function(req, res) {
+  console.log("Redirect from scenario");
+  translateQueryToOrion('all','all','all','all', function(response){
+      res.json(response);
+  });
+});
+router.get('/cbodies/:scenario_id', function(req, res) {
+  console.log("Redirect from scenario");
+  translateQueryToOrion(req.params.scenario_id,'all','all','all', function(response){
+      res.json(response);
+  });
+});
+router.get('/cbodies/:scenario_id/:sensortype', function(req, res) {
+  console.log("Redirect from sensortype");
+  translateQueryToOrion(req.params.scenario_id,req.params.sensortype,'all','all', function(response){
+      res.json(response);
+  });
+});
+router.get('/cbodies/:scenario_id/:sensortype/:pintype', function(req, res) {
+  console.log("Redirect from pintype");
+  translateQueryToOrion(req.params.scenario_id,req.params.sensortype,req.params.pintype,'all', function(response){
+      res.json(response);
+  });
+});
+router.get('/cbodies/:scenario_id/:sensortype/:pintype/:pin', function(req, res) {
+  console.log("Redirect from pintype");
+  translateQueryToOrion(req.params.scenario_id,req.params.sensortype,req.params.pintype,req.params.pin, function(response){
+      res.json(response);
+  });
+});
+
+// API POST routes
+// ...
+
+// Generic API callback Orion GET queries translator
+var translateQueryToOrion = function(scenario,sensortype,pintype,pin,callback){
+  callback = callback || function(){};
+
+  if ( scenario == "all" ) scenario = '1:2:3';
+  if ( sensortype == "all" ) sensortype = 'analog:digital';
+  if ( pintype == "all" ) pintype = 'IN:OUT';
+  if ( pin == "all" ) pin = '1:2:3:4';
+
+  arrScenarios = scenario.split(':');
+  arrSensors = sensortype.split(':');
+  arrPinTypes = pintype.split(':');
+  arrPins = pin.split(':');
+
+  var entities = [];
+  var attributes = [];
+  var queryObject = { headers: { "Content-Type": "application/json" }, data: {} };
+  var queryObjectIndex = 0;
+  arrScenarios.forEach( function(item,index,arr) {
+    entities[index] = { "type": "Scenario", "isPattern": "false", "id": "Scenario"+item};
+  });
+  arrSensors.forEach( function(sensorItem,sensorIndex,arr) {
+    arrPinTypes.forEach( function(pintypeItem,pintypeIndex,arr) {
+      arrPins.forEach( function(pinItem,pinIndex,arr) {
+          attributes[queryObjectIndex++] = sensorItem+pintypeItem+pinItem;
+      });
+    });
+  });
+  queryObject.data.entities = entities;
+  queryObject.data.attributes = attributes;
+
+  client.methods.queryContext(queryObject, function (data, response) {
+    console.log("Get scenario: " + scenario +
+                ", sensortype: " + sensortype +
+                ", pintype: " + pintype +
+                ", pin: " + pin );
+    callback(data);
+  });
+};
+
+//////////
 // TESTS
 //////////
 var getTests = {
@@ -66,110 +154,6 @@ router.route('/cbodies/test')
     });
   });
 // END TESTS
-
-//////////
-// ROUTES
-//////////
-router.get('/', function(req, res) {
-  console.log("GET /");
-  client.methods.orionVersion(function (data, response) {
-    console.log("SERVICE CHECK:");
-    console.log(data);
-    res.json(data);
-  });
-});
-
-router.route('/cbodies/:scenario_id/:sensortype/:pintype/:pin')
-  .post(function(req, res) {
-    res.json({ message: req.body });
-  })
-  .get(function(req, res) {
-    if ( req.params.scenario_id == "all" ) req.params.scenario_id = '1:2:3';
-    if ( req.params.sensortype == "all" ) req.params.sensortype = 'analog:digital';
-    if ( req.params.pintype == "all" ) req.params.pintype = 'IN:OUT';
-    if ( req.params.pin == "all" ) req.params.pin = '1:2:3:4';
-
-    arrScenarios = req.params.scenario_id.split(':');
-    arrSensors = req.params.sensortype.split(':');
-    arrPinTypes = req.params.pintype.split(':');
-    arrPins = req.params.pin.split(':');
-
-    var entities = [];
-    var attributes = [];
-    var queryObject = { headers: { "Content-Type": "application/json" }, data: {} };
-    var queryObjectIndex = 0;
-    arrScenarios.forEach( function(item,index,arr) {
-      entities[index] = { "type": "Scenario", "isPattern": "false", "id": "Scenario"+item};
-    });
-    arrSensors.forEach( function(sensorItem,sensorIndex,arr) {
-      arrPinTypes.forEach( function(pintypeItem,pintypeIndex,arr) {
-        arrPins.forEach( function(pinItem,pinIndex,arr) {
-            attributes[queryObjectIndex++] = sensorItem+pintypeItem+pinItem;
-        });
-      });
-    });
-    queryObject.data.entities = entities;
-    queryObject.data.attributes = attributes;
-
-    client.methods.queryContext(queryObject, function (data, response) {
-      console.log("Get scenario: " + req.params.scenario_id +
-                  ", sensortype: " + req.params.sensortype +
-                  ", pintype: " + req.params.pintype +
-                  ", pin: " + req.params.pin );
-      res.json(data);
-    });
-  });
-
-//
-// OLD ROUTES
-//
-// var baseGetScenarios = {
-//   data: {
-//       "entities": [
-//           {
-//               "type": "Scenario",
-//               "isPattern": "true",
-//               "id": "Scenario.*"
-//           }
-//       ]
-//       ,
-//       "attributes": [
-//           "analogIN1"
-//       ]
-//   },
-//   headers: { "Content-Type": "application/json" }
-// };
-//
-// router.route('/cbodies/:scenario_id')
-//   .post(function(req, res) {
-//     res.json({ message: req.body });
-//   })
-//   .get(function(req, res) {
-//     baseGetScenarios.data.entities[0].id = req.params.scenario_id == "all" ? "Scenario.*" : "Scenario"+req.params.scenario_id ;
-//     client.methods.queryContext(baseGetScenarios, function (data, response) {
-//       console.log("Get scenario " + req.params.scenario_id);
-//       res.json(data);
-//     });
-//   });
-//
-// WORKING GET SPECIFIC ATTRIBUTE
-//
-// router.route('/cbodies/:scenario_id/:sensortype/:pintype/:pin')
-//   .post(function(req, res) {
-//     res.json({ message: req.body });
-//   })
-//   .get(function(req, res) {
-//     baseGetScenarios.data.entities[0].id = req.params.scenario_id == "all" ? "Scenario.*" : "Scenario"+req.params.scenario_id ;
-//     baseGetScenarios.data.attributes[0] = req.params.sensortype+req.params.pintype+req.params.pin ;
-//     client.methods.queryContext(baseGetScenarios, function (data, response) {
-//       console.log("Get scenario: " + req.params.scenario_id +
-//                   ", sensortype: " + req.params.sensortype +
-//                   ", pintype: " + req.params.pintype +
-//                   ", pin: " + req.params.pin );
-//
-//       res.json(data);
-//     });
-//   });
 
 // REGISTER ROUTES -------------------------------
 // API
