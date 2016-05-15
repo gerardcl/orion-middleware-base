@@ -1,6 +1,7 @@
 
 //TODO:
-// - check orion connection errors when querying
+// - to check orion connection errors when querying
+// - to define POST routes for modifying specific attributes
 
 var Client      = require('node-rest-client').Client;
 var express     = require('express');
