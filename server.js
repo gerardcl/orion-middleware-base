@@ -24,11 +24,11 @@ router.use(function(req, res, next) {
 });
 
 
-//var orionBareURL = "http://178.62.205.167:1026"
-var orionBareURL = "http://192.168.99.100:1026"
+//var orionBaseURL = "http://178.62.205.167:1026"
+var orionBaseURL = "http://192.168.99.100:1026"
 
-client.registerMethod("orionVersion", ""+orionBareURL+"/version", "GET");
-client.registerMethod("queryContext", orionBareURL+"/v1/queryContext", "POST");
+client.registerMethod("orionVersion", ""+orionBaseURL+"/version", "GET");
+client.registerMethod("queryContext", orionBaseURL+"/v1/queryContext", "POST");
 
 //////////
 // TESTS

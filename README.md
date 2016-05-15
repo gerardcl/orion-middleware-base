@@ -27,8 +27,12 @@ Translates/simplifies ORION API through GET queries for specific scenario/contex
 
 # INSTALLATION
 
-npm install
+    npm install
+
+Note: It is required to modify variable "orionBaseURL" at server.js in order to point to your Orion working instance.
 
 # RUN
 
-npm start
+    npm start
+
+Note: By default the server listens on port 8080, so go browsing to http://localhost:8080/api
