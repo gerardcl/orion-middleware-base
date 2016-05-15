@@ -30,23 +30,6 @@ var orionBareURL = "http://192.168.99.100:1026"
 client.registerMethod("orionVersion", ""+orionBareURL+"/version", "GET");
 client.registerMethod("queryContext", orionBareURL+"/v1/queryContext", "POST");
 
-var baseGetScenarios = {
-  data: {
-      "entities": [
-          {
-              "type": "Scenario",
-              "isPattern": "true",
-              "id": "Scenario.*"
-          }
-      ]
-      ,
-      "attributes": [
-          "analogIN1"
-      ]
-  },
-  headers: { "Content-Type": "application/json" }
-};
-
 //////////
 // TESTS
 //////////
@@ -138,6 +121,23 @@ router.route('/cbodies/:scenario_id/:sensortype/:pintype/:pin')
 
 //
 // OLD ROUTES
+//
+// var baseGetScenarios = {
+//   data: {
+//       "entities": [
+//           {
+//               "type": "Scenario",
+//               "isPattern": "true",
+//               "id": "Scenario.*"
+//           }
+//       ]
+//       ,
+//       "attributes": [
+//           "analogIN1"
+//       ]
+//   },
+//   headers: { "Content-Type": "application/json" }
+// };
 //
 // router.route('/cbodies/:scenario_id')
 //   .post(function(req, res) {
