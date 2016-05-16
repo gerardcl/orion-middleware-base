@@ -2,6 +2,7 @@
 //TODO:
 // - to check orion connection errors when querying
 // - to define POST routes for modifying specific attributes
+// - to decide if response from Orion (JSON) should be filtered/prepared
 
 var Client      = require('node-rest-client').Client;
 var express     = require('express');
@@ -47,31 +48,31 @@ router.get('/', function(req, res) {
 // API GET routes
 router.get('/cbodies', function(req, res) {
   console.log("Redirect from scenario");
-  translateQueryToOrion('all','all','all','all', function(response){
+  translateGETQueryToOrion('all','all','all','all', function(response){
       res.json(response);
   });
 });
 router.get('/cbodies/:scenario_id', function(req, res) {
   console.log("Redirect from scenario");
-  translateQueryToOrion(req.params.scenario_id,'all','all','all', function(response){
+  translateGETQueryToOrion(req.params.scenario_id,'all','all','all', function(response){
       res.json(response);
   });
 });
 router.get('/cbodies/:scenario_id/:sensortype', function(req, res) {
   console.log("Redirect from sensortype");
-  translateQueryToOrion(req.params.scenario_id,req.params.sensortype,'all','all', function(response){
+  translateGETQueryToOrion(req.params.scenario_id,req.params.sensortype,'all','all', function(response){
       res.json(response);
   });
 });
 router.get('/cbodies/:scenario_id/:sensortype/:pintype', function(req, res) {
   console.log("Redirect from pintype");
-  translateQueryToOrion(req.params.scenario_id,req.params.sensortype,req.params.pintype,'all', function(response){
+  translateGETQueryToOrion(req.params.scenario_id,req.params.sensortype,req.params.pintype,'all', function(response){
       res.json(response);
   });
 });
 router.get('/cbodies/:scenario_id/:sensortype/:pintype/:pin', function(req, res) {
   console.log("Redirect from pintype");
-  translateQueryToOrion(req.params.scenario_id,req.params.sensortype,req.params.pintype,req.params.pin, function(response){
+  translateGETQueryToOrion(req.params.scenario_id,req.params.sensortype,req.params.pintype,req.params.pin, function(response){
       res.json(response);
   });
 });
@@ -80,7 +81,7 @@ router.get('/cbodies/:scenario_id/:sensortype/:pintype/:pin', function(req, res)
 // ...
 
 // Generic API callback Orion GET queries translator
-var translateQueryToOrion = function(scenario,sensortype,pintype,pin,callback){
+var translateGETQueryToOrion = function(scenario,sensortype,pintype,pin,callback){
   callback = callback || function(){};
 
   if ( scenario == "all" ) scenario = '1:2:3';
@@ -97,6 +98,7 @@ var translateQueryToOrion = function(scenario,sensortype,pintype,pin,callback){
   var attributes = [];
   var queryObject = { headers: { "Content-Type": "application/json" }, data: {} };
   var queryObjectIndex = 0;
+
   arrScenarios.forEach( function(item,index,arr) {
     entities[index] = { "type": "Scenario", "isPattern": "false", "id": "Scenario"+item};
   });
@@ -160,6 +162,9 @@ router.route('/cbodies/test')
 app.use('/api', router);
 // WEB
 app.use(express.static(process.cwd() + '/public'));
+app.use(function(req, res){
+      res.json({ error : "404"});
+  });
 // START THE SERVER
 // =============================================================================
 app.listen(port);
