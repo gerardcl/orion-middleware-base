@@ -45,7 +45,7 @@ angular.module('cBodies').directive('analogSensor', function() {
   return {
     restrict: 'AEC',
     scope : {
-      label:'=sensorAttr'
+      label:'@sensorAttr'
     },
     replace: true,
     template: '<canvas nx="slider" min="0" label="{{label}}" max="255" id="{{label}}"></canvas>'
