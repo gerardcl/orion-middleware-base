@@ -31,6 +31,7 @@ var orionBaseURL = "http://192.168.99.100:1026"
 
 client.registerMethod("orionVersion", ""+orionBaseURL+"/version", "GET");
 client.registerMethod("queryContext", orionBaseURL+"/v1/queryContext", "POST");
+client.registerMethod("updateContext", orionBaseURL+"/v1/updateContext", "POST");
 
 //////////
 // ROUTES
@@ -78,8 +79,65 @@ router.get('/cbodies/:scenario_id/:sensortype/:pintype/:pin', function(req, res)
 });
 
 // API POST routes
-// ...
+router.post('/cbodies/update', function(req, res) {
+  console.log("Redirect from pintype");
+  console.log(req.body);
+  translatePOSTQueryToOrion(req.body, function(response){
+      res.json(response);
+  });
+});
 
+var translatePOSTQueryToOrion = function(queryObject, callback){
+  callback = callback || function(){};
+  var queryRequest = {
+  	data: queryObject,
+  	headers: { "Content-Type": "application/json" }
+  };
+  client.methods.updateContext(queryRequest, function (data, response) {
+    console.log("POST:");
+    console.log(queryObject);
+    console.log(queryObject.contextElements[0].attributes);
+    console.log("RESPONSE:");
+    console.log(data.contextResponses[0].contextElement.attributes);
+
+
+    // {
+    //     "contextResponses": [
+    //         {
+    //             "contextElement": {
+    //                 "attributes": [
+    //                     {
+    //                         "name": "analogIN1",
+    //                         "type": "float",
+    //                         "value": ""
+    //                     },
+    //                     {
+    //                         "name": "digitalIN1",
+    //                         "type": "integer",
+    //                         "value": ""
+    //                     }
+    //                 ],
+    //                 "id": "Scenario1",
+    //                 "isPattern": "false",
+    //                 "type": "Scenario"
+    //             },
+    //             "statusCode": {
+    //                 "code": "200",
+    //                 "reasonPhrase": "OK"
+    //             }
+    //         }
+    //     ]
+    // }
+
+
+    // console.log("POST scenario: " + scenario +
+    //             ", sensortype: " + sensortype +
+    //             ", pintype: " + pintype +
+    //             ", pin: " + pin );
+    callback(data);
+  });
+
+};
 // Generic API callback Orion GET queries translator
 var translateGETQueryToOrion = function(scenario,sensortype,pintype,pin,callback){
   callback = callback || function(){};

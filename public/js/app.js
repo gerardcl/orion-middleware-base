@@ -14,9 +14,8 @@ angular.module('cBodies').controller('CbodiesController', function($rootScope,$s
 
     $scope.fetchMessage = function(/* reuse this or reimplement with sensor ID... */) {
       $interval(function(prevGreeting) {
-        console.log('Request number: '+ ++$scope.count);
         $scope.getCbodies();
-      }, 3000);
+      }, 200);
     }
   }
 );
@@ -26,7 +25,7 @@ angular.module('cBodies').factory('cBodiesService', function($http) {
     getCbodies: function(city, country) {
       //var query = city + ',' + country;
       //console.log("Using Service cBodiesService");
-      return $http.get('/api/cbodies'
+      return $http.get('/api/cbodies/1/analog/IN/1'
       // , {
       //   params: {
       //     q: query
@@ -41,28 +40,47 @@ angular.module('cBodies').factory('cBodiesService', function($http) {
   }
 });
 
-angular.module('cBodies').directive('analogSensor', function() {
+angular.module('cBodies').directive('analogSensor', function($http) {
   return {
     restrict: 'AEC',
     scope : {
       label:'@sensorAttr'
     },
     replace: true,
-    template: '<canvas nx="slider" min="0" label="{{label}}" max="255" id="{{label}}"></canvas>'
-    // link: function(scope, elem, attrs) {
-    //   console.log(elem);
-    //   scope.$watch('message', function(value) {
-    //     //console.log('Message Changed!');
-    //     // this does another call? just in case gloabl object does not work
-    //     // and it is required to work in a per sensor/object basis calls
-    //   });
-    //   // scope.clearMessage = function() {
-    //   //   scope.message = '';
-    //   // }
-    //   // elem.bind('mouseover', function() {
-    //   //    elem.css('cursor', 'pointer');
-    //   // });
-    //
-    // }
+    //template: '<canvas nx="slider" min="0" label="{{label}}" max="255" id="{{label}}"></canvas>',
+    template: '<input type="text" ng-model="analogValue">',
+    link: function(scope, elem, attrs) {
+      console.log(elem);
+      scope.$watch('analogValue', function(value) {
+        if (value == undefined) value = 2;
+        console.log('Analog value changed!' + value);
+        var data = {"contextElements":[{"type": "Scenario","isPattern": "false","id": "Scenario1",
+                                        "attributes": [
+                                            {
+                                                "name": "analogIN1",
+                                                "type": "float",
+                                                "value": value
+                                            }
+                                        ]
+                                    }],
+                    "updateAction": "UPDATE"
+                };
+        console.log("ATTRIBUTE: ");
+        console.log(data.contextElements[0].attributes[0].value);
+        $http.post('/api/cbodies/update',data).success(function(response, status) {
+          console.log(response);
+        });
+        // this does another call? just in case gloabl object does not work
+        // and it is required to work in a per sensor/object basis calls
+      });
+      // scope.clearMessage = function() {
+      //   scope.message = '';
+      // }
+      elem.bind('mouseover', function() {
+        console.log("MOUSOVER "+scope.label);
+        //elem.colors.accent("#ffffff");
+      });
+
+    }
   }
 });
